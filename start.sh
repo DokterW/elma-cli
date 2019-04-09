@@ -8,11 +8,11 @@ ELMANAM="elma-cli"
 ELMAVER="0.3"
 ELMAQUR="$@"
 # -----------------------------------------------------------------------------------
+ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/ /%20/g')
 ELMAAPI=$(curl -s https://hotell.difi.no/api/json/difi/elma/participants?query=$ELMAQUR | sed -r 's/Ja/Yes/g' | sed -r 's/Nei/No/g')
 ELMALIN=$(echo "$ELMAAPI" | jq -r '.entries[].name' | wc -l)
 ELMACNT="0"
 if [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
-    ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/ /%20/g')
     echo "$ELMANAM v$ELMAVER"
     until [[ "$ELMACNT" = "$ELMALIN" ]]; do
         echo ""
@@ -29,9 +29,10 @@ if [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
         ELMACNT=$(expr $ELMACNT + 1)
     done
 elif [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
+    ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/%20/ /g')
     echo "$ELMANAM v$ELMAVER"
     echo ""
-    echo "No entry with $ELMAQUR"
+    echo "No entry with $ELMAQUR."
 else
     echo "$ELMANAM v$ELMAVER"
     echo ""
