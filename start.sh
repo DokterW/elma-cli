@@ -1,19 +1,19 @@
 #!/bin/bash
-# elma-cli v0.2
+# elma-cli v0.3
 # Made by Dokter Waldijk
 # Search ELMA in the terminal.
 # By running this script you agree to the license terms.
 # Config ----------------------------------------------------------------------------
 ELMANAM="elma-cli"
-ELMAVER="0.2"
+ELMAVER="0.3"
 ELMAQUR="$@"
-ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/ /%20/g')
 # -----------------------------------------------------------------------------------
 ELMAAPI=$(curl -s https://hotell.difi.no/api/json/difi/elma/participants?query=$ELMAQUR | sed -r 's/Ja/Yes/g' | sed -r 's/Nei/No/g')
 ELMALIN=$(echo "$ELMAAPI" | jq -r '.entries[].name' | wc -l)
 ELMACNT="0"
-echo "$ELMANAM v$ELMAVER"
-if [[ -n $ELMAQUR ]]; then
+if [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
+    ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/ /%20/g')
+    echo "$ELMANAM v$ELMAVER"
     until [[ "$ELMACNT" = "$ELMALIN" ]]; do
         echo ""
         echo -n "   Name: "
@@ -28,6 +28,10 @@ if [[ -n $ELMAQUR ]]; then
         echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].EHF_INVOICE_CREDITNOTE_2_0"
         ELMACNT=$(expr $ELMACNT + 1)
     done
+elif [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
+    echo "$ELMANAM v$ELMAVER"
+    echo ""
+    echo "No entry with $ELMAQUR"
 else
     echo "$ELMANAM v$ELMAVER"
     echo ""
