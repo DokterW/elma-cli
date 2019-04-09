@@ -10,9 +10,10 @@ ELMAQUR="$@"
 # -----------------------------------------------------------------------------------
 ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/ /%20/g')
 ELMAAPI=$(curl -s https://hotell.difi.no/api/json/difi/elma/participants?query=$ELMAQUR | sed -r 's/Ja/Yes/g' | sed -r 's/Nei/No/g')
-ELMALIN=$(echo "$ELMAAPI" | jq -r '.entries[].name' | wc -l)
+ELMATST=$(echo "$ELMAAPI" | jq -r '.entries[].name')
+ELMALIN=$(echo "$ELMATST" | wc -l)
 ELMACNT="0"
-if [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
+if [[ -n $ELMAQUR ]] && [[ -n "$ELMATST" ]]; then
     echo "$ELMANAM v$ELMAVER"
     until [[ "$ELMACNT" = "$ELMALIN" ]]; do
         echo ""
@@ -28,7 +29,7 @@ if [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
         echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].EHF_INVOICE_CREDITNOTE_2_0"
         ELMACNT=$(expr $ELMACNT + 1)
     done
-elif [[ -n $ELMAQUR ]] && [[ -n "$ELMAAPI" ]]; then
+elif [[ -n $ELMAQUR ]] && [[ -z "$ELMATST" ]]; then
     ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/%20/ /g')
     echo "$ELMANAM v$ELMAVER"
     echo ""
