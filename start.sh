@@ -1,11 +1,11 @@
 #!/bin/bash
-# elma-cli v0.3
+# elma-cli v0.4
 # Made by Dokter Waldijk
 # Search ELMA in the terminal.
 # By running this script you agree to the license terms.
 # Config ----------------------------------------------------------------------------
 ELMANAM="elma-cli"
-ELMAVER="0.3"
+ELMAVER="0.4"
 ELMAQUR="$@"
 # -----------------------------------------------------------------------------------
 ELMAQUR=$(echo "$ELMAQUR" | sed -r 's/ /%20/g')
@@ -14,9 +14,10 @@ ELMATST=$(echo "$ELMAAPI" | jq -r '.entries[].name')
 ELMALIN=$(echo "$ELMATST" | wc -l)
 ELMACNT="0"
 if [[ -n $ELMAQUR ]] && [[ -n "$ELMATST" ]]; then
-    echo "$ELMANAM v$ELMAVER"
     until [[ "$ELMACNT" = "$ELMALIN" ]]; do
-        echo ""
+        if [[ "$ELMACNT" -ge "1" ]]; then
+            echo ""
+        fi
         echo -n "   Name: "
         echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].name"
         echo -n "    ICD: "
@@ -24,9 +25,9 @@ if [[ -n $ELMAQUR ]] && [[ -n "$ELMATST" ]]; then
         echo -n "   Org#: "
         echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].identifier"
         echo -n "EHF 2.0: "
-        echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].PEPPOLBIS_3_0_BILLING_01_UBL"
-        echo -n "EHF 3.0: "
         echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].EHF_INVOICE_CREDITNOTE_2_0"
+        echo -n "EHF 3.0: "
+        echo -n "$ELMAAPI" | jq -r ".entries[$ELMACNT].PEPPOLBIS_3_0_BILLING_01_UBL"
         ELMACNT=$(expr $ELMACNT + 1)
     done
 elif [[ -n $ELMAQUR ]] && [[ -z "$ELMATST" ]]; then
